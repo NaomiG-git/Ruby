@@ -1,0 +1,33 @@
+# Core dependencies
+memu-py>=1.3.0
+openai>=1.0.0
+httpx>=0.28.0
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+python-dotenv>=1.0.0
+
+# Token counting
+tiktoken>=0.5.0
+
+# Logging
+structlog>=24.0.0
+
+# CLI enhancements
+rich>=13.0.0
+
+# Retry logic
+tenacity>=8.0.0
+
+# Optional providers (uncomment as needed)
+anthropic>=0.18.0
+google-generativeai>=0.4.0
+duckduckgo-search>=5.0.0
+beautifulsoup4>=4.12.0
+googlesearch-python>=1.2.0
+playwright>=1.40.0
+
+# Desktop Integration
+mss>=9.0.0
+pillow>=10.0.0
+# Video analysis
+yt-dlp>=2024.3.10

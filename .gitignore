@@ -1,0 +1,41 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+
+# Data and Logs
+data/
+logs/
+*.log
+gemini_debug.txt
+video_debug.txt
+
+# Node / Frontend
+node_modules/
+dist/
+dist-electron/
+.eslintcache
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.bak
+reproduce_gemini_error.py
