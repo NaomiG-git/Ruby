@@ -1,0 +1,3 @@
+# This directory holds community-installed Ruby skills.
+# Each subdirectory is a skill package with its own __init__.py.
+# Use: python -m skills install <skill-name>

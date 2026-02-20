@@ -67,13 +67,13 @@ Interact with Ruby across the channels you already use:
 
 | Channel | Status |
 |---|---|
-| WhatsApp | Planned |
-| Telegram | Planned |
-| Discord | Planned |
-| Slack | Planned |
-| Signal | Planned |
-| Microsoft Teams | Planned |
-| SMS (Windows-paired Android) | Planned |
+| WhatsApp | ✅ Built (`channels/whatsapp.py`) |
+| Telegram | ✅ Built (`channels/telegram.py`) |
+| Discord | ✅ Built (`channels/discord.py`) |
+| Slack | ✅ Built (`channels/slack.py`) |
+| Signal | ✅ Built (`channels/signal.py`) |
+| Microsoft Teams | ✅ Built (`channels/teams.py`) |
+| SMS (Twilio) | ✅ Built (`channels/sms.py`) |
 
 ### AI Model Support
 Ruby connects to AI providers using your **existing subscription** — no API keys, no separate billing. Authentication is handled via OAuth PKCE — sign in once in a browser, tokens stored in the encrypted vault.
@@ -97,22 +97,24 @@ Switch models at any time with the `/model` command:
 ```
 
 ### Scheduling & Automation
-- **Cron-based scheduled jobs** — daily briefings, automated reports, recurring tasks
-- **Smart reminders** — set reminders in natural language; Ruby follows up proactively
-- **Webhook triggers** — inbound (external services trigger Ruby) and outbound (Ruby calls external services)
-- **Event-driven automation** — trigger flows from Gmail, calendar events, file changes, or system events
-- **Windows Task Scheduler integration** — Ruby jobs run even when the UI is closed
-- **Automation chains** — link multiple skills into multi-step workflows with conditional logic
+- **Cron-based scheduled jobs** — ✅ `scheduling/cron.py` — daily briefings, automated reports, recurring tasks
+- **Smart reminders** — ✅ `scheduling/reminders.py` — set in natural language; Ruby follows up proactively
+- **Webhook triggers** — ✅ `scheduling/webhooks.py` — inbound (external → Ruby) and outbound (Ruby → external), HMAC-validated
+- **Event-driven automation** — ✅ `scheduling/chains.py` — multi-step chains: prompt, send, webhook, condition, wait, set_var
+- **Windows Task Scheduler** — ✅ `scheduling/windows_tasks.py` — Ruby jobs run even when UI is closed
+- **Scheduling manager** — ✅ `scheduling/manager.py` — single `SchedulingManager` coordinates all subsystems
 
 ### Browser Automation
-- Dedicated Chromium instance with CDP control
-- Form filling, file uploads, agent-driven browser sessions
-- Sandboxed per-session browser profiles
+- ✅ `browser/cdp.py` — Chromium DevTools Protocol async client
+- ✅ `browser/browser.py` — `BrowserSession`: Playwright (preferred) or raw CDP; form fill, file upload, screenshot
+- ✅ AI-assisted `.instruct()` — tell Ruby in natural language what to do on a page; she drives the browser
 
 ### Skills Platform
-- Modular, installable skill packages (`SKILL.md` based)
-- Community skills registry (coming soon)
-- CLI: `ruby skill install <name>`, `ruby skill update`, `ruby skill list`
+- ✅ `skills/base.py` — `@skill_tool` decorator, `ToolMetadata`, OpenAI + Gemini schema auto-generation
+- ✅ `skills/loader.py` — discovers and loads skills from `builtins/` and `installed/`
+- ✅ `skills/registry.py` — community skill install/update/uninstall via Git
+- ✅ CLI: `python -m skills install <name>`, `python -m skills update`, `python -m skills list`
+- ✅ Built-in: `web_search` (DuckDuckGo, no key required)
 
 ---
 
@@ -196,7 +198,7 @@ Ruby/
 ├── email/          # Gmail + Outlook integration
 ├── files/          # Local file management + app launcher
 ├── models/         # 🤖 AI model support
-│   ├── __init__.py        # Module exports
+│   ├── __init__.py
 │   ├── openai_client.py   # ChatGPT (Plus/Pro) via OAuth PKCE — no API key
 │   ├── gemini_client.py   # Gemini 3 via Google OAuth 2.0 — no API key
 │   └── router.py          # Unified router: fallback chain, /model switching, history
@@ -206,10 +208,45 @@ Ruby/
 │   ├── identity.py        # HMAC-SHA256 signed pairing tokens + peer allowlist
 │   ├── windows_hello.py   # Windows Hello biometric / PIN vault unlock
 │   └── audit.py           # Security audit CLI (--deep, --fix, --json)
-├── channels/       # Messaging channel adapters (planned)
-├── scheduling/     # Cron jobs, reminders, webhooks, automation chains (planned)
-├── browser/        # CDP browser automation (planned)
-└── docs/           # Documentation and threat model
+├── channels/       # 📡 Multi-channel messaging adapters
+│   ├── __init__.py
+│   ├── base.py            # ChannelAdapter ABC, InboundMessage, OutboundMessage
+│   ├── whatsapp.py        # Meta Cloud API webhook adapter
+│   ├── telegram.py        # Telegram Bot API (long-poll + webhook)
+│   ├── discord.py         # discord.py Gateway adapter
+│   ├── slack.py           # Slack Bolt + Socket Mode (no public URL needed)
+│   ├── signal.py          # signal-cli JSON-RPC adapter
+│   ├── teams.py           # Microsoft Bot Framework webhook
+│   ├── sms.py             # Twilio SMS/MMS adapter
+│   └── manager.py         # ChannelManager — wires adapters → ModelRouter
+├── scheduling/     # ⏰ Scheduling & automation
+│   ├── __init__.py
+│   ├── cron.py            # Async 5-field cron scheduler with vault persistence
+│   ├── reminders.py       # Natural-language reminder manager (regex + AI fallback)
+│   ├── webhooks.py        # Inbound + outbound webhook server (HMAC validated)
+│   ├── chains.py          # Multi-step automation chains (ChainBuilder fluent API)
+│   ├── windows_tasks.py   # Windows Task Scheduler integration (schtasks.exe)
+│   ├── run_job.py         # CLI entry point for Task Scheduler invocations
+│   └── manager.py         # SchedulingManager — orchestrates all scheduling systems
+├── browser/        # 🌐 Browser automation
+│   ├── __init__.py
+│   ├── cdp.py             # Chrome DevTools Protocol client (async WebSocket)
+│   └── browser.py         # BrowserSession — Playwright or CDP, AI-assisted .instruct()
+├── skills/         # 🔧 Skills platform
+│   ├── __init__.py
+│   ├── base.py            # @skill_tool decorator, ToolMetadata, ToolParam
+│   ├── loader.py          # SkillLoader — discovers & loads @skill_tool functions
+│   ├── registry.py        # Community registry client (install/update/uninstall)
+│   ├── builtins/
+│   │   └── web_search/    # Built-in DuckDuckGo search skill
+│   └── installed/         # User-installed community skills (git-based)
+├── agents/         # 🤖 Multi-agent routing
+│   ├── __init__.py
+│   ├── base.py            # BaseAgent ABC, AgentCapability, AgentResult
+│   ├── orchestrator.py    # Orchestrator — AUTO/PARALLEL/SEQUENTIAL/FIRST_WIN routing
+│   └── sandbox.py         # AgentSandbox — Docker isolated agent execution
+└── docs/
+    └── MITRE_ATLAS_THREAT_MODEL.md  # Full MITRE ATLAS threat model for Ruby
 ```
 
 ---
@@ -239,16 +276,19 @@ Ruby/
 - [x] Windows Hello biometric unlock — `security/windows_hello.py`
 - [x] Security audit CLI — `security/audit.py` (`python -m security.audit [--deep] [--fix] [--json]`)
 - [x] AI model module — `models/` (OpenAI OAuth, Gemini OAuth, router, fallback chain, `/model` command)
+- [x] Multi-channel messaging — `channels/` (WhatsApp, Telegram, Discord, Slack, Signal, Teams, SMS)
+- [x] Scheduling & automation — `scheduling/` (cron, reminders, webhooks, chains, Windows Task Scheduler)
+- [x] Browser automation — `browser/` (CDP client + BrowserSession with AI-assisted `.instruct()`)
+- [x] Skills platform — `skills/` (`@skill_tool` decorator, SkillLoader, community registry CLI)
+- [x] Multi-agent routing — `agents/` (Orchestrator, 5 built-in agents, Docker sandboxing)
+- [x] MITRE ATLAS threat model — `docs/MITRE_ATLAS_THREAT_MODEL.md`
 
 **In progress / planned:**
-- [ ] Multi-channel messaging (WhatsApp, Telegram, Discord, Slack, Signal, Teams, SMS)
-- [ ] Advanced scheduling — cron jobs, smart reminders, recurring tasks
-- [ ] Event-driven automation chains with webhook triggers
-- [ ] Windows Task Scheduler integration
-- [ ] Browser automation (CDP — dedicated Chromium, form actions, uploads)
-- [ ] Skills platform + community registry
-- [ ] Multi-agent routing with Docker sandboxing
-- [ ] MITRE ATLAS threat model documentation
+- [ ] Community skill registry hosted index (GitHub-based JSON index)
+- [ ] Hash pinning for installed skills (SHA-256 verification against registry index)
+- [ ] Anomaly detection for token usage per sender
+- [ ] Llama Guard pre-filter for prompt injection defence
+- [ ] Rootless Docker + seccomp profile for agent sandboxes
 
 ---
 

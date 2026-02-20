@@ -1,0 +1,44 @@
+{
+  "name": "ruby-ai",
+  "version": "1.0.0",
+  "description": "Ruby — AI life partner, Windows-native desktop + multi-channel messaging",
+  "main": "ui/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder --win",
+    "lint": "eslint ui/"
+  },
+  "dependencies": {
+    "electron-store": "^10.0.0"
+  },
+  "devDependencies": {
+    "electron": "^29.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "dev.antigravity.ruby",
+    "productName": "Ruby",
+    "win": {
+      "target": ["nsis"],
+      "icon": "ui/assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "ui/**/*",
+      "models/**/*",
+      "security/**/*",
+      "channels/**/*",
+      "skills/**/*",
+      "package.json"
+    ]
+  },
+  "author": "NaomiG-git",
+  "license": "SEE LICENSE IN LICENSE"
+}
